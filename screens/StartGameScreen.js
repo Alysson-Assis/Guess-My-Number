@@ -1,61 +1,99 @@
-import { StyleSheet, View, TextInput, Text } from "react-native";
-import PrimaryButton from "../components/PrimaryButton";
-import { useState } from "react";
+function StartGameScreen({ onPickNumber }) {
+  // armazena o número digitado pelo usuário
+  const [enteredNumber, setEnteredNumber] = useState("");
 
-function StartGameScreen() {
-  const [enteredNumber, setenteredNumber] = useState('');
+  function numberInputHandler(enteredText) {
+    // atualiza o state conforme o usuário digita
+    setEnteredNumber(enteredText);
+  }
 
-  function numberinputHandler(enteredText){
-    setenteredNumber(enteredText)
+  function resetInputHandler() {
+    // limpa o campo de entrada
+    setEnteredNumber("");
+  }
+
+  function confirmInputHandler() {
+    // converte o texto digitado para número
+    const chosenNumber = parseInt(enteredNumber);
+
+    // impede números inválidos
+    if (isNaN(chosenNumber) || chosenNumber <= 0 || chosenNumber > 99) {
+      Alert.alert("Número Inválido!", "O número tem que ser entre 1 e 99.", [
+        {
+          text: "Ok",
+          style: "destructive",
+
+          // limpa o input ao fechar o alerta
+          onPress: resetInputHandler,
+        },
+      ]);
+      return;
+    }
+
+    // envia o número escolhido para o componente pai
+    onPickNumber(chosenNumber);
   }
 
   return (
-    <View style={styles.inputContainer}>
-      <TextInput
-        style={styles.numberInput}
-        maxLength={2}
-        keyboardType="number-pad"
-        autoCapitalize="none"
-        autoCorrect={false}
-        value={enteredNumber}
-        onChangeText={numberinputHandler}
-      />
-      <View style={styles.buttonsContainer}>
-        <View style={{ flex: 1}}>
-          <PrimaryButton>Reset</PrimaryButton>
+    <View style={styles.rootContainer}>
+      <Title>Guess My Number</Title>
+
+      {/* cartão que agrupa o input e os botões */}
+      <Card>
+        <InstructionText>Enter a Number</InstructionText>
+
+        <TextInput
+          style={styles.numberInput}
+          maxLength={2} // limita a dois dígitos
+          keyboardType="number-pad" // exibe o teclado numérico
+          autoCapitalize="none" // desabilita capitalização automática
+          autoCorrect={false} // desabilita correção automática
+          value={enteredNumber} // transforma o input em componente controlado
+          onChangeText={numberInputHandler} // atualiza o state ao digitar
+        />
+
+        {/* ações para limpar ou confirmar o número */}
+        <View style={styles.buttonsContainer}>
+          <View style={styles.buttonContainer}>
+            <PrimaryButton onPress={resetInputHandler}>
+              Resetar
+            </PrimaryButton>
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <PrimaryButton onPress={confirmInputHandler}>
+              Confirmar
+            </PrimaryButton>
+          </View>
         </View>
-        <View style={{ flex: 1}}>
-          <PrimaryButton>Confirm</PrimaryButton>
-        </View>
-      </View>
+      </Card>
     </View>
   );
 }
 
-export default StartGameScreen;
-
 const styles = StyleSheet.create({
-  inputContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+  rootContainer: {
+    flex: 1,
     marginTop: 100,
-    marginHorizontal: 24,
-    padding: 16,
-    backgroundColor: "#3b021f",
-    borderRadius: 8,
-    elevation: 4,
+    alignItems: "center",
   },
-  buttonsContainer: { flexDirection: 'row'},
+
   numberInput: {
     height: 50,
     width: 50,
     paddingTop: 2,
     fontSize: 32,
-    borderColor: "#ddb52f",
+    borderColor: Colors.accent500,
     borderBottomWidth: 2,
-    color: "#ddb52f",
+    color: Colors.accent500,
     marginVertical: 8,
     fontWeight: "bold",
     textAlign: "center",
   },
+  buttonsContainer: { 
+    flexDirection: "row" 
+  },
+  buttonContainer:{
+    flex: 1 
+  }
 });
